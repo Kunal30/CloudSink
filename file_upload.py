@@ -6,6 +6,8 @@ from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from quickstart import get_google_drive_auth_service
+from tqdm import tqdm
+import logging
 
 folder_id={
 	"Docx":"1K9KRQ_Hqgnwp0PDlYTMPN1UqWTvMiLIB",
@@ -15,6 +17,7 @@ folder_id={
 	"PPTs":"1hXx5ahjjzyqj7aBZ4RRq3FmT0_UrVeUP",
 	"Spreadsheets":"1TJrPb45YbnlN-AjRATT8JYoK0silOiDE",
 	"Videos":"1SsAKlEhbX5VoRLg-g5zlAyFqjlysM47c",
+	"Audios":"1_vYbC2ISK9Cq27Sr0oKsrl8V2h17aNQ2",
 	"ZIPs":"17sfXSxk8DH_W2g_KvLn8PlRcQ_5cM_CV"
 }
 supported_types=["doc",
@@ -39,6 +42,7 @@ supported_types=["doc",
 	"mkv",
 	"avi",
 	"mp4",
+	"mp3",
 	"m4v",
 	"7z",
 	"rar",
@@ -72,6 +76,7 @@ mime_types={
 	"rar":"application/x-rar-compressed",
 	"zip":"application/zip",
 	"zipx":"application/zip",
+	"mp3":"audio/mpeg",
 	"misc":"application/octet-stream"
 }
 types={
@@ -102,6 +107,7 @@ types={
 	"rar":"ZIPs",
 	"zip":"ZIPs",
 	"zipx":"ZIPs",
+	"mp3":"Audios",
 	"misc":"MISC"
 }
 
@@ -117,14 +123,14 @@ class FileUploader:
 
 		media = MediaFileUpload(filename='/Users/kunalsuthar/Downloads/'+filename,
 		                        mimetype=mime_types.get(file_type),resumable=True)
-
+		# print(os.path.getsize("/Users/kunalsuthar/Downloads/"+filename))
 		drive_service=get_google_drive_auth_service()
 		file = drive_service.files().create(body=file_metadata,
 		                                    media_body=media,
 		                                    fields='id').execute()
 		print(file.get('id'))
 
-		self.write_to_log(filename)
+		self.write_to_log(filename=filename)
 
 	def get_file_type(self,filename):
 		list_=filename.split('.')
@@ -136,8 +142,11 @@ class FileUploader:
 		return type_	
 		
 	def write_to_log(self,filename):
-		pass
+		logging.basicConfig(filename='app.log', filemode='a', format='%(asctime)s - %(message)s',level=logging.INFO)
+		logging.info(filename)
 
-	def upload_to_drive(self,file_list):		
-		for file in file_list:
+	def upload_to_drive(self,file_list):
+		if len(file_list) == 0:
+			print('No new files to write')					
+		for file in tqdm(file_list):
 			self.upload_file_to_drive(filename=file)

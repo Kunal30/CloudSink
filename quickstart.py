@@ -40,10 +40,9 @@ def get_google_drive_auth_service():
 
     if not items:
         print('No files found.')
-    else:
-        print('Files:')
-        for item in items:
-            print(u'{0} ({1})'.format(item['name'], item['id']))
+        # print('Files:')
+        # for item in items:
+        #     print(u'{0} ({1})'.format(item['name'], item['id']))
 
     return service
 

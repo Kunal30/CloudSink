@@ -22,7 +22,15 @@ class FileStalker:
 			pickle.dump(list_,f)
 			return list_	
 
+	def update_snapshots(self):
+		print('Updating Snapshots....')
+		f=open('fs.pickle','wb')
+		total_=self.get_files_snapshot()
+		pickle.dump(total_,f)
+
 	def get_files_to_upload(self):
+		print(self.get_files_snapshot())
+		print(self.get_previous_files_snapshot())
 		diff_=list(set(self.get_files_snapshot())-set(self.get_previous_files_snapshot()))
 		return diff_
 
